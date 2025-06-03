@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профиль пользователя</title>
+</head>
+<body>
+    <h1>Профиль: {{ username }}</h1>
+    <ul>
+        <li>Количество сыгранных игр: {{ total_games }}</li>
+        <li>Сумма очков: {{ total_points }}</li>
+        <li>Рейтинг (среднее за последние 20 игр): {{ rating }}</li>
+    </ul>
+    <a href="{{ url_for('index') }}">На главную</a>
+</body>
+</html>

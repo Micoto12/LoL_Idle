@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lolidle</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Угадай чемпиона</h1>
+    <a href="{{ url_for('profile') }}">Профиль</a>
+    <input type="text" id="guessInput" placeholder="Введите имя чемпиона" autocomplete="off">
+    <div id="autocomplete-list" class="autocomplete-items"></div>
+    <button id="startGameBtn" onclick="startGame()">Новая игра</button>
+    <button id="guessBtn" onclick="sendGuess()" style="display:none;">Отправить</button>
+    <div id="result"></div>
+    <script src="/static/js/app.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById('guessInput');
+    const autocompleteList = document.getElementById('autocomplete-list');
+
+    // Слушаем ввод в поле
+    input.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 1) {
+            autocompleteList.innerHTML = '';
+            return;
+        }
+        // Запрашиваем подсказки у сервера
+        fetch(`/autocomplete?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                autocompleteList.innerHTML = '';
+                data.forEach(name => {
+                    const item = document.createElement('div');
+                    item.classList.add('autocomplete-item');
+                    item.textContent = name;
+                    // При клике на подсказку — подставляем её в поле и убираем список
+                    item.onclick = function() {
+                        input.value = name;
+                        autocompleteList.innerHTML = '';
+                    };
+                    autocompleteList.appendChild(item);
+                });
+            });
+    });
+
+    // Скрываем подсказки при клике вне поля
+    document.addEventListener('click', function(e) {
+        if (e.target !== input) {
+            autocompleteList.innerHTML = '';
+        }
+    });
+});
+</script>
+</body>
+</html>

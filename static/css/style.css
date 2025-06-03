@@ -1,0 +1,19 @@
+.hide {
+    display: none;
+}
+.autocomplete-items {
+    border: 1px solid #d4d4d4;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background: #fff;
+    z-index: 99;
+}
+.autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+}
+.autocomplete-item:hover {
+    background-color: #e9e9e9;
+}
