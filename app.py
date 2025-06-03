@@ -210,6 +210,23 @@ def profile():
         rating=rating
     )
 
+@app.route('/leaderboard')
+def leaderboard():
+    # Получаем пользователей и их суммарные очки
+    results = (
+        db.session.query(
+            User.username,
+            func.sum(GameResult.points).label('total_points')
+        )
+        .join(GameResult, User.id == GameResult.user_id)
+        .group_by(User.id)
+        .order_by(func.sum(GameResult.points).desc())
+        .limit(10)
+        .all()
+    )
+    # results — список кортежей (username, total_points)
+    return render_template('leaderboard.html', results=results)
+
 @app.route('/game')
 @login_required
 def game():
