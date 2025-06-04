@@ -175,7 +175,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         # Проверка на уникальность пользователя
         if User.query.filter_by(username=username).first():
             flash('Username already exists')
@@ -200,6 +200,17 @@ def login():
             flash('Неправильное имя пользователя или пароль')
             return redirect(url_for('login'))
     return render_template('login.html')
+
+from flask_login import logout_user, login_required
+from flask import redirect, url_for, flash
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Вы вышли из аккаунта.')
+    return redirect(url_for('login'))
+
 
 @app.route('/profile')
 @login_required

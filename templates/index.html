@@ -6,7 +6,12 @@
 </head>
 <body>
     <h1>Угадай чемпиона</h1>
-    <a href="{{ url_for('profile') }}">Профиль</a>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('profile') }}">Профиль</a>
+        <a href="{{ url_for('logout') }}">Выйти</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Войти</a>
+    {% endif %}
     <input type="text" id="guessInput" placeholder="Введите имя чемпиона" autocomplete="off">
     <div id="autocomplete-list" class="autocomplete-items"></div>
     <button id="startGameBtn" onclick="startGame()">Новая игра</button>
