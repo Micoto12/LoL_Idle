@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.sql import func
+from sqlalchemy import text
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -81,18 +82,17 @@ def get_champion(champ_id):
     else:
         return jsonify({"error": "Champion not found"}), 404
     
-from flask import jsonify, request
-
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
-    query = request.args.get('q', '').lower()
+    query = request.args.get('q', '')
     if not query:
         return jsonify([])
-    # Найти чемпионов, имя которых начинается с введённой строки (регистр не важен)
-    results = Champion.query.filter(Champion.name.ilike(f'{query}%')).all()
+    # ВАЖНО: используем text() для явного COLLATE NOCASE
+    results = Champion.query.filter(
+        text("name LIKE :q COLLATE NOCASE")
+    ).params(q=f"{query}%").all()
     names = [champ.name for champ in results]
     return jsonify(names)
-
 
 @app.route('/api/start_game', methods=['GET'])
 def start_game():
