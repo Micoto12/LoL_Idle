@@ -42,6 +42,7 @@ class Champion(db.Model):
     role = db.Column(db.String(50))
     gender = db.Column(db.String(20))
     region = db.Column(db.String(50))
+    damage_type = db.Column(db.String(50))
 
 with app.app_context():
     db.create_all()
@@ -101,6 +102,7 @@ def start_game():
     session['target_role'] = champion.role
     session['target_gender'] = champion.gender
     session['target_region'] = champion.region
+    session['target_damage_type'] = champion.damage_type
     session['attempts'] = 0
     return jsonify({"message": "Game started", "attempts": 0})
 
@@ -139,17 +141,25 @@ def guess():
     else:
         hints = []
         if guessed_champ.role == session.get('target_role'):
-            hints.append("Роль совпадает")
+            hints.append("Роль: " + guessed_champ.role + " ✅")
         else:
-            hints.append("Роль не совпадает")
+            hints.append("Роль: " + guessed_champ.role + " ❌")
+        
         if guessed_champ.gender == session.get('target_gender'):
-            hints.append("Пол совпадает")
+            hints.append("Пол: " + guessed_champ.gender + " ✅")
         else:
-            hints.append("Пол не совпадает")
+            hints.append("Пол: " + guessed_champ.gender + " ❌")
+        
         if guessed_champ.region == session.get('target_region'):
-            hints.append("Регион совпадает")
+            hints.append("Регион: " + guessed_champ.region + " ✅")
         else:
-            hints.append("Регион не совпадает")
+            hints.append("Регион: " + guessed_champ.region + " ❌")
+        
+        if guessed_champ.damage_type == session.get('target_damage_type'):
+            hints.append("Тип урона:" + guessed_champ.damage_type + " ✅")
+        else:
+            hints.append("Тип урона: " + guessed_champ.damage_type + " ❌")
+        
         return jsonify({
             "result": "wrong",
             "attempts": session['attempts'],

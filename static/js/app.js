@@ -25,8 +25,10 @@ function sendGuess() {
             document.getElementById('guessBtn').style.display = "none";      // Скрыть кнопку "Guess"
             document.getElementById('startGameBtn').style.display = "inline"; // Показать "Новая игра"
         } else {
-            document.getElementById('result').innerText = 
-                `Неправильно! Подсказки: ${data.hints.join(", ")} (Попыток: ${data.attempts})`;
+            document.getElementById('result').innerHTML =
+            `Неправильно!<br>Подсказки:<ul>` +
+            data.hints.map(hint => `<li>${hint}</li>`).join('') +
+            `</ul>(Попыток: ${data.attempts})`;
         }
     });
 }
