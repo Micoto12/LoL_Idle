@@ -140,10 +140,20 @@ def guess():
         })
     else:
         hints = []
-        if guessed_champ.role == session.get('target_role'):
-            hints.append("Роль: " + guessed_champ.role + " ✅")
+        guessed_roles = [r.strip() for r in guessed_champ.role.split(',')]
+        target_role = session.get('target_role', '') or ''  # Гарантирует строку даже если None
+        target_roles = [r.strip() for r in target_role.split(',') if r.strip()]
+
+        guessed_set = set(guessed_roles)
+        target_set = set(target_roles)
+
+        if guessed_set == target_set:
+            hints.append(f"Роль: {', '.join(guessed_roles)} ✅")
+        elif guessed_set & target_set:
+            common_roles = guessed_set & target_set
+            hints.append(f"Роль: частично совпадает ({', '.join(common_roles)}) ⚠️")
         else:
-            hints.append("Роль: " + guessed_champ.role + " ❌")
+            hints.append(f"Роль: {', '.join(guessed_roles)} ❌")
         
         if guessed_champ.gender == session.get('target_gender'):
             hints.append("Пол: " + guessed_champ.gender + " ✅")
@@ -232,8 +242,8 @@ def profile():
 
 @app.route('/leaderboard')
 def leaderboard():
-    # Получаем пользователей и их суммарные очки
-    results = (
+    # Топ-10 по сумме очков
+    points_results = (
         db.session.query(
             User.username,
             func.sum(GameResult.points).label('total_points')
@@ -244,8 +254,38 @@ def leaderboard():
         .limit(10)
         .all()
     )
-    # results — список кортежей (username, total_points)
-    return render_template('leaderboard.html', results=results)
+
+    # Топ-10 по рейтингу (средний рейтинг за последние 20 игр каждого пользователя)
+    rating_results = []
+    users = User.query.all()
+    for user in users:
+        last_20_games = (
+            GameResult.query
+            .filter_by(user_id=user.id)
+            .order_by(GameResult.id.desc())
+            .limit(20)
+            .all()
+        )
+        if last_20_games:
+            avg_rating = sum(gr.points for gr in last_20_games) / len(last_20_games)
+            rating_results.append((user.username, avg_rating))
+    # Отсортировать по рейтингу и взять топ-10
+    rating_results = sorted(rating_results, key=lambda x: x[1], reverse=True)[:10]
+
+    return render_template(
+        'leaderboard.html',
+        points_results=points_results,
+        rating_results=rating_results
+    )
+
+@app.route('/changelog')
+def changelog():
+    try:
+        with open('version.txt', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = "Файл version.txt не найден."
+    return render_template('changelog.html', content=content)
 
 @app.route('/game')
 @login_required

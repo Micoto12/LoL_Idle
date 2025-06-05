@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <h1>Профиль: {{ username }}</h1>
@@ -10,8 +11,12 @@
         <li>Сумма очков: {{ total_points }}</li>
         <li>Рейтинг (среднее за последние 20 игр): {{ rating }}</li>
     </ul>
-    <a href="{{ url_for('index') }}">На главную</a>
-    <a href="{{ url_for('leaderboard') }}">Рейтинг игроков</a>
-    <a href="{{ url_for('logout') }}">Выйти</a>
+    <div class="profile-side-links">
+        <a href="{{ url_for('leaderboard') }}">Рейтинг игроков</a>
+        <a href="{{ url_for('logout') }}">Выйти</a>
+    </div>
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
 </body>
 </html>

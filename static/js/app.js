@@ -2,10 +2,12 @@ function startGame() {
     fetch('/api/start_game')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('result').innerText = "Игра началась! Введите имя чемпиона.";
+            document.getElementById('game-message').innerText = "Игра началась! Введите имя чемпиона.";
+            document.getElementById('result').innerText = "";
             document.getElementById('startGameBtn').style.display = "none";   // Скрыть кнопку "Новая игра"
             document.getElementById('guessBtn').style.display = "inline";     // Показать кнопку "Guess"
             document.getElementById('guessInput').value = "";                 // Очистить поле ввода
+            document.getElementById('guess-block').style.display = 'flex';
         });
 }
 
@@ -36,5 +38,7 @@ function sendGuess() {
 // При загрузке страницы показываем только кнопку "Новая игра"
 window.onload = function() {
     document.getElementById('startGameBtn').style.display = "inline";
+    document.getElementById('guess-block').style.display = 'none';
     document.getElementById('guessBtn').style.display = "none";
+    document.getElementById('guessBtn').addEventListener('click', sendGuess);
 };

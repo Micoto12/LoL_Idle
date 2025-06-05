@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Топ 10 игроков</title>
+    <title>Рейтинг игроков</title>
 </head>
 <body>
-    <h1>Рейтинг игроков (ТОП-10)</h1>
+    <h1>Рейтинг игроков (ТОП-10 по очкам)</h1>
     <table border="1">
         <tr>
             <th>Место</th>
             <th>Имя пользователя</th>
             <th>Очки</th>
         </tr>
-        {% for row in results %}
+        {% for row in points_results %}
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ row[0] }}</td>
@@ -19,6 +19,23 @@
         </tr>
         {% endfor %}
     </table>
+
+    <h1>Рейтинг игроков (ТОП-10 по рейтингу)</h1>
+    <table border="1">
+        <tr>
+            <th>Место</th>
+            <th>Имя пользователя</th>
+            <th>Средний рейтинг</th>
+        </tr>
+        {% for row in rating_results %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ row[0] }}</td>
+            <td>{{ "%.2f"|format(row[1]) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
     <a href="{{ url_for('profile') }}">Вернуться в профиль</a>
 </body>
 </html>
