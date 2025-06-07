@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Угадай чемпиона</h1>
+    
     {% if current_user.is_authenticated %}
         <div class="top-links">
             <a href="{{ url_for('profile') }}">Профиль</a>
@@ -17,16 +17,20 @@
         </div>
     {% endif %}
 
-    <div id="guess-block" class="center-content" style="display: none;">
+    <div class="guess-container" id="guess-block" style="display: none;">
         <div id="game-message"></div>
-        <input type="text" id="guessInput" placeholder="Введите имя чемпиона" autocomplete="off">
-        <button id="guessBtn">Отправить</button>
+        <div class="guess-form">
+            <input type="text" id="guessInput" placeholder="Введите имя чемпиона" autocomplete="off">
+            <button id="guessBtn" onclick="sendGuess()" >Отправить</button>
+        </div>
         <div id="autocomplete-list" class="autocomplete-items"></div>
+        <div id="result"></div>
     </div>
-
+    
     <div id="autocomplete-list" class="autocomplete-items"></div>
-    <button id="startGameBtn" onclick="startGame()">Новая игра</button>
-    <div id="result"></div>
+    <div class="start-game-container" id="start-game-container">
+        <button id="startGameBtn" onclick="startGame()">Новая игра</button>
+    </div>
     <script src="/static/js/app.js"></script>
 
     <script>

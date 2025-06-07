@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Изменения и обновления</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Список изменений и будущих обновлений</h1>
-    <pre>{{ content }}</pre>
-    <a href="{{ url_for('index') }}">На главную</a>
+
+    <div class="changelog">
+        <h1>Список изменений и будущих обновлений</h1>
+        <pre>{{ content }}</pre>
+    </div>
+
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
 </body>
 </html>

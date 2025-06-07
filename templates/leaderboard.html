@@ -2,40 +2,48 @@
 <html>
 <head>
     <title>Рейтинг игроков</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Рейтинг игроков (ТОП-10 по очкам)</h1>
-    <table border="1">
-        <tr>
-            <th>Место</th>
-            <th>Имя пользователя</th>
-            <th>Очки</th>
-        </tr>
-        {% for row in points_results %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ row[0] }}</td>
-            <td>{{ "%.2f"|format(row[1]) }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="leaderboard-table-container">
+        <h2>Топ-10 по очкам</h2>
+        <table class="leaderboard-table">
+            <tr>
+                <th>Место</th>
+                <th>Имя пользователя</th>
+                <th>Очки</th>
+            </tr>
+            {% for row in points_results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row[0] }}</td>
+                <td>{{ "%.2f"|format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    <h1>Рейтинг игроков (ТОП-10 по рейтингу)</h1>
-    <table border="1">
-        <tr>
-            <th>Место</th>
-            <th>Имя пользователя</th>
-            <th>Средний рейтинг</th>
-        </tr>
-        {% for row in rating_results %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ row[0] }}</td>
-            <td>{{ "%.2f"|format(row[1]) }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="leaderboard-table-container">
+        <h2>Топ-10 по рейтингу</h2>
+        <table class="leaderboard-table">
+            <tr>
+                <th>Место</th>
+                <th>Имя пользователя</th>
+                <th>Средний рейтинг</th>
+            </tr>
+            {% for row in rating_results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row[0] }}</td>
+                <td>{{ "%.2f"|format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    <a href="{{ url_for('profile') }}">Вернуться в профиль</a>
+
+    <div class="profile-top-left">
+        <a href="{{ url_for('profile') }}">Вернуться в профиль</a>
+    </div>
 </body>
 </html>

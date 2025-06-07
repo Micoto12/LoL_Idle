@@ -2,6 +2,14 @@
 .hide {
     display: none;
 }
+body {
+    background-image: url('/static/image/background.png');      /* путь к вашей картинке */
+    background-size: cover;                       /* чтобы картинка покрывала весь экран */
+    background-repeat: no-repeat;                 /* чтобы картинка не повторялась */
+    background-color: #424242;                    /* резервный цвет, если картинка не загрузится */
+    background-attachment: fixed; /* Это важно! */
+    min-height: 100vh;
+}
 .autocomplete-items {
     border: 1px solid #d4d4d4;
     border-top: none;
@@ -32,14 +40,15 @@
 }
 .top-links a {
     text-decoration: none;
-    color: #3366cc;
+    color: #36a8eb;
+    background: #416eff60;
     font-weight: bold;
     padding: 6px 12px;
     border-radius: 4px;
     transition: background 0.2s;
 }
 .top-links a:hover {
-    background: #e0e7ff;
+    background: #154cff80;
 }
 
 /* Ссылка внизу по центру */
@@ -53,15 +62,15 @@
 }
 .bottom-link a {
     text-decoration: none;
-    color: #3366cc;
+    color: #474747;
     font-weight: bold;
     padding: 6px 12px;
     border-radius: 4px;
-    background: #f1f5fb;
+    background: #ffffff00;
     transition: background 0.2s;
 }
 .bottom-link a:hover {
-    background: #e0e7ff;
+    background: #000b3073;
 }
 
 /* Кнопка "Выйти" на странице профиля */
@@ -111,14 +120,15 @@
 }
 .profile-top-left a {
     text-decoration: none;
-    color: #3366cc;
+    color: #36a8eb;
+    background: #416eff60;
     font-weight: bold;
     padding: 6px 12px;
     border-radius: 4px;
     transition: background 0.2s;
 }
 .profile-top-left a:hover {
-    background: #e0e7ff;
+    background: #154cff80;
 }
 
 .profile-side-links {
@@ -132,15 +142,15 @@
 }
 .profile-side-links a {
     text-decoration: none;
-    color: #3366cc;
+    color: #36a8eb;
+    background: #416eff60;
     font-weight: bold;
     padding: 6px 12px;
     border-radius: 4px;
-    background: #f1f5fb;
     transition: background 0.2s;
 }
 .profile-side-links a:hover {
-    background: #e0e7ff;
+    background: #154cff80;
 }
 .center-content {
     display: flex;
@@ -156,4 +166,211 @@
     font-size: 1.2em;
     text-align: center;
     color: #333;
+}
+.start-game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh; /* Центрирует по вертикали на большей части экрана */
+}
+
+#startGameBtn {
+    font-size: 2rem;        /* Сделать кнопку большой */
+    padding: 24px 60px;     /* Увеличить внутренние отступы */
+    border-radius: 12px;
+    background: #1246add5;
+    color: #78a5f7fa;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 4px 16px rgba(51,102,204,0.1);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+#startGameBtn:hover {
+    background: #254a91;
+    transform: scale(1.05);
+}
+/* Центрирование блока угадывания */
+.guess-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+/* Сообщение о начале игры */
+#game-message {
+    margin-bottom: 32px;
+    font-size: 1.4rem;
+    text-align: center;
+    color: #333;
+}
+
+/* Контейнер для поля ввода и кнопки */
+.guess-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+/* Большое поле ввода */
+#guessInput {
+    font-size: 1rem;
+    padding: 18px 28px;
+    border-radius: 12px;
+    border: 1px solid #c2bb7f;
+    outline: none;
+    width: 350px;
+    box-sizing: border-box;
+    transition: border 0.2s;
+}
+#guessInput:focus {
+    border: 1.5px solid #3366cc;
+}
+
+/* Большая кнопка "Отправить" */
+#guessBtn {
+    font-size: 1rem;
+    padding: 18px 42px;
+    border-radius: 12px;
+    background: #1246add5;
+    color: #78a5f7fa;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+#guessBtn:hover {
+    background: #254a91;
+    transform: scale(1.05);
+}
+
+/* Стили автодополнения (оставьте ваши) */
+.autocomplete-items {
+    border: 1px solid #d4d4d4;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background: #fff;
+    z-index: 99;
+}
+.autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+}
+.autocomplete-item:hover {
+    background-color: #e9e9e9;
+}
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 60px auto 0 auto;
+    padding: 32px 40px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 420px;
+}
+
+.profile-info h2 {
+    font-family: 'Futura', 'Helvetica Neue', Arial, sans-serif; /* современный стиль */
+    font-size: 2.2rem;
+    color: #2d3a4b;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.profile-info p {
+    font-family: 'Garamond', 'Georgia', serif; /* элегантный акцент для текста */
+    font-size: 1.15rem;
+    color: #444;
+    margin: 8px 0;
+    letter-spacing: 0.5px;
+}
+.changelog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: left;
+    margin: 60px auto 0 30px;
+    padding: 32px 200px;
+    background: rgba(11, 0, 109, 0.562);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 420px;
+    color: #fff;
+    font-family: 'Segoe UI', 'Arial', 'Helvetica Neue', sans-serif; /* современный читаемый шрифт */
+    font-size: 1.15rem; /* увеличенный базовый размер текста */
+    line-height: 1.6;   /* для лучшей читаемости */
+}
+
+/* Для заголовка внутри changelog */
+.changelog h1, .changelog h2 {
+    font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif; /* выразительный заголовок */
+    font-size: 2.2rem;           /* увеличенный размер */
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #ffeedd;              /* чуть более тёплый белый, чтобы выделить */
+    text-align: center;
+    letter-spacing: 1px;
+}
+.leaderboard-table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px auto 0 auto;
+    padding: 32px 40px;
+    background: rgba(11, 0, 109, 0.562);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 600px;
+    color: #fff;
+}
+
+.leaderboard-table-container h2 {
+    font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 18px;
+    color: #ffeedd;
+    text-align: center;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.25);
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.leaderboard-table th {
+    background: rgba(255,255,255,0.10);
+    color: #ffeedd;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.leaderboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tr:nth-child(even) {
+    background: rgba(255,255,255,0.04);
+}
+
+.leaderboard-table tr:hover {
+    background: rgba(255,255,255,0.13);
 }

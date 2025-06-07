@@ -44,6 +44,7 @@ class Champion(db.Model):
     gender = db.Column(db.String(20))
     region = db.Column(db.String(50))
     damage_type = db.Column(db.String(50))
+    position = db.Column(db.String(50))
 
 with app.app_context():
     db.create_all()
@@ -103,6 +104,7 @@ def start_game():
     session['target_gender'] = champion.gender
     session['target_region'] = champion.region
     session['target_damage_type'] = champion.damage_type
+    session['target_position'] = champion.position
     session['attempts'] = 0
     return jsonify({"message": "Game started", "attempts": 0})
 
@@ -141,8 +143,11 @@ def guess():
     else:
         hints = []
         guessed_roles = [r.strip() for r in guessed_champ.role.split(',')]
+        guessed_positions = [r.strip() for r in guessed_champ.position.split(',')]
         target_role = session.get('target_role', '') or ''  # Гарантирует строку даже если None
         target_roles = [r.strip() for r in target_role.split(',') if r.strip()]
+        target_position = session.get('target_position', '') or ''
+        target_positions = [r.strip() for r in target_position.split(',') if r.strip()]
 
         guessed_set = set(guessed_roles)
         target_set = set(target_roles)
@@ -154,7 +159,18 @@ def guess():
             hints.append(f"Роль: частично совпадает ({', '.join(common_roles)}) ⚠️")
         else:
             hints.append(f"Роль: {', '.join(guessed_roles)} ❌")
-        
+
+        guessed_set = set(guessed_positions)
+        target_set = set(target_positions)
+
+        if guessed_set == target_set:
+            hints.append(f"Позиция: {', '.join(guessed_positions)} ✅")
+        elif guessed_set & target_set:
+            common_positions = guessed_set & target_set
+            hints.append(f"Позиция: частично совпадает ({', '.join(common_positions)}) ⚠️")
+        else:
+            hints.append(f"Позиция: {', '.join(guessed_positions)} ❌")
+
         if guessed_champ.gender == session.get('target_gender'):
             hints.append("Пол: " + guessed_champ.gender + " ✅")
         else:

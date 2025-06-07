@@ -41,4 +41,11 @@ window.onload = function() {
     document.getElementById('guess-block').style.display = 'none';
     document.getElementById('guessBtn').style.display = "none";
     document.getElementById('guessBtn').addEventListener('click', sendGuess);
+
+    document.getElementById('guessInput').addEventListener('keydown', function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // чтобы не было лишних действий по умолчанию
+        document.getElementById('guessBtn').click();
+    }
+    });
 };
