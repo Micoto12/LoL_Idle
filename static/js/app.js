@@ -14,7 +14,7 @@ function startGame() {
             document.getElementById('guessBtn').style.display = "inline";
             document.getElementById('guessInput').value = "";
             document.getElementById('guess-block').style.display = 'flex';
-            updateAutocompleteSource();
+            handleNewGameStart();
         });
 }
 
@@ -46,13 +46,14 @@ function sendGuess() {
                 document.getElementById('result').innerText = `Правильно! Попыток: ${data.attempts}`;
                 document.getElementById('guessBtn').style.display = "none";
                 document.getElementById('startGameBtn').style.display = "inline";
+                handleNewGameStart();
             } else {
                 document.getElementById('result').innerHTML =
                     `Неправильно!<br>Подсказки:<ul>` +
                     data.hints.map(hint => `<li>${hint}</li>`).join('') +
                     `</ul>(Попыток: ${data.attempts})`;
             }
-            console.log('usedChampions:', usedChampions);
+            //console.log('usedChampions:', usedChampions);
         }
     });
 }
@@ -62,6 +63,12 @@ function fetchAutocompleteSuggestions(query, callback) {
     fetch(`/autocomplete?q=${encodeURIComponent(query)}&used=${encodeURIComponent(used)}`)
         .then(response => response.json())
         .then(data => callback(data));
+}
+
+function handleNewGameStart() {
+    usedChampions = [];
+    localStorage.removeItem('usedChampions'); // если используешь localStorage
+    updateAutocompleteSource();
 }
 
 function saveUsedChampions() {
@@ -114,6 +121,30 @@ function showStartButton() {
     document.getElementById('guessBtn').style.display = "none";
     document.getElementById('game-message').innerText = "";
     document.getElementById('result').innerText = "";
+}
+
+function resetUsedChampions() {
+    fetch('/admin/reset_used', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('admin-info').innerText = 'Список использованных чемпионов сброшен!';
+        });
+}
+
+function resetAttempts() {
+    fetch('/admin/reset_attempts', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('admin-info').innerText = 'Попытки сброшены!';
+        });
+}
+
+function showTargetChampion() {
+    fetch('/admin/show_target')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('admin-info').innerText = 'Угадываемый чемпион: ' + (data.target_name || 'нет');
+        });
 }
 
 guessInput.addEventListener('input', function() {

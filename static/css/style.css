@@ -374,3 +374,45 @@ body {
 .leaderboard-table tr:hover {
     background: rgba(255,255,255,0.13);
 }
+
+.admin-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    margin: 32px auto 0 auto;
+    padding: 24px 32px;
+    max-width: 400px;
+    background: rgba(255, 215, 0, 0.08); /* слегка золотистый прозрачный фон */
+    border: 2px solid #ffd700;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(34, 52, 94, 0.09);
+}
+
+.admin-panel button {
+    width: 100%;
+    padding: 12px 0;
+    margin: 0;
+    background: #1246add5;
+    color: #fffbe6;
+    font-weight: bold;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+}
+
+.admin-panel button:hover {
+    background: #ffd700;
+    color: #1246add5;
+}
+
+#admin-info {
+    margin-top: 12px;
+    color: #1246add5;
+    font-size: 1em;
+    text-align: center;
+    font-weight: 500;
+}

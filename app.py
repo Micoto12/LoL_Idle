@@ -51,11 +51,23 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 def get_random_champion():
-    champ = Champion.query.order_by(func.random()).first()
+    champ = db.session.query(Champion).order_by(func.random()).first()
     return champ
+
+def init_new_game():
+    champion = get_random_champion()
+    session['target_id'] = champion.id
+    session['target_name'] = champion.name
+    session['target_role'] = champion.role
+    session['target_gender'] = champion.gender
+    session['target_region'] = champion.region
+    session['target_damage_type'] = champion.damage_type
+    session['target_position'] = champion.position
+    session['attempts'] = 0
+    session['guessed_names'] = []  # Сброс использованных чемпионов
 
 # Эндпоинт для получения списка всех персонажей
 @app.route('/api/champions', methods=['GET'])
@@ -73,7 +85,7 @@ def get_champions():
 # Эндпоинт для получения одного персонажа по ID
 @app.route('/api/champion/<int:champ_id>', methods=['GET'])
 def get_champion(champ_id):
-    champ = Champion.query.get(champ_id)
+    champ = db.session.get(Champion, champ_id)
     if champ:
         return jsonify({
             "id": champ.id,
@@ -92,7 +104,7 @@ def autocomplete():
     if not query:
         return jsonify([])
 
-    results = Champion.query.filter(
+    results = db.session.query(Champion).filter(
         text("name LIKE :q COLLATE NOCASE")
     ).params(q=f"{query}%").all()
 
@@ -102,28 +114,14 @@ def autocomplete():
 
 @app.route('/api/start_game', methods=['GET'])
 def start_game():
-    session['guessed_names'] = []
-    if 'target_id' not in session:
-        champion = get_random_champion()
-        session['target_id'] = champion.id
-        session['target_name'] = champion.name
-        session['target_role'] = champion.role
-        session['target_gender'] = champion.gender
-        session['target_region'] = champion.region
-        session['target_damage_type'] = champion.damage_type
-        session['target_position'] = champion.position
-        session['attempts'] = 0
-        return jsonify({"message": "Game started", "attempts": 0})
-    else:
-        # Вернуть текущее состояние игры, если она уже идет
-        return jsonify({"message": "Game already in progress", "attempts": session['attempts']})
-    
+    init_new_game()
+    return jsonify({"message": "Game started", "attempts": 0})
+
 @app.route('/api/game_status', methods=['GET'])
 def game_status():
-    if 'target_id' in session:
-        return jsonify({"in_progress": True, "attempts": session.get('attempts', 0)})
-    else:
-        return jsonify({"in_progress": False})
+    if session.get('attempts', 0) == 0 or 'target_id' not in session:
+        init_new_game()
+    return jsonify({"in_progress": True, "attempts": session.get('attempts', 0)})
 
 @app.route('/api/guess', methods=['POST'])
 def guess():
@@ -133,12 +131,11 @@ def guess():
     # Проверка на пустой ввод
     if not user_guess:
         return jsonify({"error": "Введите имя чемпиона!"}), 400
-    guessed_champ = Champion.query.filter_by(name=user_guess).first()
+    guessed_champ = db.session.query(Champion).filter_by(name=user_guess).first()
 
     # Проверка существования чемпиона
     if not guessed_champ:
         return jsonify({"error": "Чемпион не найден!"}), 404
-    session['attempts'] = session.get('attempts', 0) + 1
 
     # Инициализация списка, если его нет
     if 'guessed_names' not in session:
@@ -150,6 +147,7 @@ def guess():
 
     # Добавляем имя в список попыток
     session['guessed_names'].append(user_guess)
+    session['attempts'] = session.get('attempts', 0) + 1
     session.modified = True
 
     target_id = session.get('target_id')
@@ -167,7 +165,8 @@ def guess():
             db.session.add(game_result)
             db.session.commit()
         # --- Конец блока сохранения результата ---
-
+        session['attempts'] = 0
+        session['guessed_names'] = []
         return jsonify({
             "result": "correct",
             "attempts": session['attempts'],
@@ -236,10 +235,12 @@ def register():
         username = request.form['username']
         password = request.form['password']
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
         # Проверка на уникальность пользователя
-        if User.query.filter_by(username=username).first():
+        if db.session.query(User).filter_by(username=username).first():
             flash('Username already exists')
             return redirect(url_for('register'))
+        
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
@@ -252,7 +253,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
+        user = db.session.query(User).filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
@@ -276,7 +277,7 @@ def logout():
 @login_required
 def profile():
     # Получаем все игры пользователя (GameResult — ваша модель результатов)
-    games = GameResult.query.filter_by(user_id=current_user.id).order_by(GameResult.timestamp.desc()).all()
+    games = db.session.query(GameResult).filter_by(user_id=current_user.id).order_by(GameResult.timestamp.desc()).all()
     total_games = len(games)
     total_points = sum(game.points for game in games)
     last_20_games = games[:20]
@@ -307,10 +308,10 @@ def leaderboard():
 
     # Топ-10 по рейтингу (средний рейтинг за последние 20 игр каждого пользователя)
     rating_results = []
-    users = User.query.all()
+    users = db.session.query(User).all()
     for user in users:
         last_20_games = (
-            GameResult.query
+            db.session.query(GameResult)
             .filter_by(user_id=user.id)
             .order_by(GameResult.id.desc())
             .limit(20)
@@ -342,6 +343,36 @@ def changelog():
 def game():
     # Игровая логика только для авторизованных пользователей
     return render_template('game.html')
+
+@app.route('/debug/used')
+def debug_used():
+    return jsonify(session.get('guessed_names', []))
+
+from flask_login import current_user, login_required
+
+@app.route('/admin/reset_used', methods=['POST'])
+@login_required
+def admin_reset_used():
+    if current_user.username != 'admin':
+        return jsonify({'error': 'Access denied'}), 403
+    session['guessed_names'] = []
+    return jsonify({'status': 'ok'})
+
+@app.route('/admin/reset_attempts', methods=['POST'])
+@login_required
+def admin_reset_attempts():
+    if current_user.username != 'admin':
+        return jsonify({'error': 'Access denied'}), 403
+    session['attempts'] = 0
+    return jsonify({'status': 'ok'})
+
+@app.route('/admin/show_target', methods=['GET'])
+@login_required
+def admin_show_target():
+    if current_user.username != 'admin':
+        return jsonify({'error': 'Access denied'}), 403
+    target_name = session.get('target_name')
+    return jsonify({'target_name': target_name})
 
 if __name__ == '__main__':
     app.run(debug=True)

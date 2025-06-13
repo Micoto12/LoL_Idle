@@ -17,6 +17,15 @@
         </div>
     {% endif %}
 
+    {% if current_user.is_authenticated and current_user.username == 'admin' %}
+    <div class="admin-panel">
+        <button onclick="resetUsedChampions()">Сбросить использованных чемпионов</button>
+        <button onclick="resetAttempts()">Сбросить попытки</button>
+        <button onclick="showTargetChampion()">Показать угадываемого чемпиона</button>
+        <div id="admin-info"></div>
+    </div>
+    {% endif %}
+
     <div class="guess-container" id="guess-block" style="display: none;">
     <div id="game-message"></div>
     <form id="guessForm" autocomplete="off">
