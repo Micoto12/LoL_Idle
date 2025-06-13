@@ -86,40 +86,72 @@ def get_champion(champ_id):
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     query = request.args.get('q', '')
+    used = request.args.get('used', '')
+    used_names = [name.strip() for name in used.split(',') if name.strip()] if used else []
+
     if not query:
         return jsonify([])
-    # ВАЖНО: используем text() для явного COLLATE NOCASE
+
     results = Champion.query.filter(
         text("name LIKE :q COLLATE NOCASE")
     ).params(q=f"{query}%").all()
-    names = [champ.name for champ in results]
+
+    # Исключаем использованных
+    names = [champ.name for champ in results if champ.name not in used_names]
     return jsonify(names)
 
 @app.route('/api/start_game', methods=['GET'])
 def start_game():
-    champion = get_random_champion()
-    session['target_id'] = champion.id
-    session['target_name'] = champion.name
-    session['target_role'] = champion.role
-    session['target_gender'] = champion.gender
-    session['target_region'] = champion.region
-    session['target_damage_type'] = champion.damage_type
-    session['target_position'] = champion.position
-    session['attempts'] = 0
-    return jsonify({"message": "Game started", "attempts": 0})
+    session['guessed_names'] = []
+    if 'target_id' not in session:
+        champion = get_random_champion()
+        session['target_id'] = champion.id
+        session['target_name'] = champion.name
+        session['target_role'] = champion.role
+        session['target_gender'] = champion.gender
+        session['target_region'] = champion.region
+        session['target_damage_type'] = champion.damage_type
+        session['target_position'] = champion.position
+        session['attempts'] = 0
+        return jsonify({"message": "Game started", "attempts": 0})
+    else:
+        # Вернуть текущее состояние игры, если она уже идет
+        return jsonify({"message": "Game already in progress", "attempts": session['attempts']})
+    
+@app.route('/api/game_status', methods=['GET'])
+def game_status():
+    if 'target_id' in session:
+        return jsonify({"in_progress": True, "attempts": session.get('attempts', 0)})
+    else:
+        return jsonify({"in_progress": False})
 
 @app.route('/api/guess', methods=['POST'])
 def guess():
     data = request.json
     user_guess = data.get('name')
+
+    # Проверка на пустой ввод
     if not user_guess:
-        return jsonify({"error": "Name is required"}), 400
-
+        return jsonify({"error": "Введите имя чемпиона!"}), 400
     guessed_champ = Champion.query.filter_by(name=user_guess).first()
-    if not guessed_champ:
-        return jsonify({"error": "Champion not found"}), 404
 
-    session['attempts'] += 1
+    # Проверка существования чемпиона
+    if not guessed_champ:
+        return jsonify({"error": "Чемпион не найден!"}), 404
+    session['attempts'] = session.get('attempts', 0) + 1
+
+    # Инициализация списка, если его нет
+    if 'guessed_names' not in session:
+        session['guessed_names'] = []
+
+    # Проверка на повтор
+    if user_guess in session['guessed_names']:
+        return jsonify({'error': 'Вы уже вводили этого чемпиона!'}), 400
+
+    # Добавляем имя в список попыток
+    session['guessed_names'].append(user_guess)
+    session.modified = True
+
     target_id = session.get('target_id')
     if guessed_champ.id == target_id:
         # --- Начало блока сохранения результата ---
@@ -138,7 +170,8 @@ def guess():
 
         return jsonify({
             "result": "correct",
-            "attempts": session['attempts']
+            "attempts": session['attempts'],
+            "accepted_name": guessed_champ.name
         })
     else:
         hints = []
@@ -189,7 +222,8 @@ def guess():
         return jsonify({
             "result": "wrong",
             "attempts": session['attempts'],
-            "hints": hints
+            "hints": hints,
+            "accepted_name": guessed_champ.name
         })
     
 @app.route('/')

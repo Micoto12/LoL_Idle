@@ -18,14 +18,14 @@
     {% endif %}
 
     <div class="guess-container" id="guess-block" style="display: none;">
-        <div id="game-message"></div>
-        <div class="guess-form">
-            <input type="text" id="guessInput" placeholder="Введите имя чемпиона" autocomplete="off">
-            <button id="guessBtn" onclick="sendGuess()" >Отправить</button>
-        </div>
-        <div id="autocomplete-list" class="autocomplete-items"></div>
-        <div id="result"></div>
-    </div>
+    <div id="game-message"></div>
+    <form id="guessForm" autocomplete="off">
+        <input id="guessInput" type="text" ...>
+        <button type="submit" id="guessBtn">Отправить</button>
+    </form>
+    <div id="autocomplete-list" class="autocomplete-items"></div>
+    <div id="result"></div>
+</div>
     
     <div id="autocomplete-list" class="autocomplete-items"></div>
     <div class="start-game-container" id="start-game-container">
@@ -33,45 +33,7 @@
     </div>
     <script src="/static/js/app.js"></script>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    const input = document.getElementById('guessInput');
-    const autocompleteList = document.getElementById('autocomplete-list');
-
-    // Слушаем ввод в поле
-    input.addEventListener('input', function() {
-        const query = this.value;
-        if (query.length < 1) {
-            autocompleteList.innerHTML = '';
-            return;
-        }
-        // Запрашиваем подсказки у сервера
-        fetch(`/autocomplete?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(data => {
-                autocompleteList.innerHTML = '';
-                data.forEach(name => {
-                    const item = document.createElement('div');
-                    item.classList.add('autocomplete-item');
-                    item.textContent = name;
-                    // При клике на подсказку — подставляем её в поле и убираем список
-                    item.onclick = function() {
-                        input.value = name;
-                        autocompleteList.innerHTML = '';
-                    };
-                    autocompleteList.appendChild(item);
-                });
-            });
-    });
-
-    // Скрываем подсказки при клике вне поля
-    document.addEventListener('click', function(e) {
-        if (e.target !== input) {
-            autocompleteList.innerHTML = '';
-        }
-    });
-});
-</script>
+    
 <div class="bottom-link">
     <a href="{{ url_for('changelog') }}">Изменения и обновления</a>
 </div>

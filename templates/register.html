@@ -5,15 +5,19 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Регистрация</h1>
     <div class="profile-top-left">
         <a href="{{ url_for('index') }}">На главную</a>
     </div>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Никнейм" required>
-        <input type="password" name="password" placeholder="Пароль" required>
-        <button type="submit">Зарегистрироваться</button>
-    </form>
-    <a href="{{ url_for('login') }}">Уже есть аккаунт? Войти</a>
+    <div class="center-content">
+        <h1 style="color:#2d3a4b; margin-bottom: 28px;">Регистрация</h1>
+        <form method="POST" style="display:flex; flex-direction:column; gap:18px; width:320px;">
+            <input type="text" name="username" placeholder="Никнейм" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <input type="password" name="password" placeholder="Пароль" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <button type="submit" style="padding:14px; border-radius:8px; background:#1246add5; color:#78a5f7fa; border:none; font-weight:bold; font-size:1.1em; cursor:pointer; transition:background 0.2s;">Зарегистрироваться</button>
+        </form>
+        <div style="margin-top:18px;">
+            <a href="{{ url_for('login') }}" style="color:#36a8eb; background:#416eff60; font-weight:bold; padding:6px 12px; border-radius:4px; text-decoration:none; transition:background 0.2s;">Уже есть аккаунт? Войти</a>
+        </div>
+    </div>
 </body>
 </html>
