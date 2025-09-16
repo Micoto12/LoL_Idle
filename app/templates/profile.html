@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - {{ current_user.username }}{% endblock %}
+
+{% block content %}
+<div class="profile-info">
+    <h1>Профиль: {{ current_user.username }}</h1>
+    <p><strong>Количество сыгранных игр:</strong> {{ total_games }}</p>
+    <p><strong>Сумма очков:</strong> {{ total_points }}</p>
+    <p><strong>Рейтинг (среднее за последние 20 игр):</strong> {{ rating }}</p>
+</div>
+
+<div class="profile-side-links">
+    <a href="{{ url_for('main.leaderboard') }}">Таблица лидеров</a>
+    <a href="{{ url_for('auth.logout') }}">Выйти</a>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LolIdle{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Верхнее меню / ссылки -->
+    <div class="top-bar">
+        <div class="top-links">
+            <!-- Ссылки профиля и выхода для авторизованных -->
+            {% if current_user.is_authenticated %}
+                {% if request.endpoint == 'main.index' %}
+                    <a href="{{ url_for('auth.profile') }}">Профиль</a>
+                    <a href="{{ url_for('tft.index') }}">TFT Ачивки</a>
+                {% endif %}
+            {% else %}
+                <!-- Ссылки входа и регистрации для неавторизованных -->
+                <a href="{{ url_for('auth.login') }}">Войти</a>
+                <a href="{{ url_for('auth.register') }}">Регистрация</a>
+            {% endif %}
+        </div>
+
+        <!-- Админ-панель: ТОЛЬКО на главной странице и ТОЛЬКО для админа -->
+        {% if current_user.is_authenticated and current_user.username == 'admin' and request.endpoint == 'main.index' %}
+        <div class="admin-panel">
+            <button onclick="resetUsedChampions()">Сбросить использованных</button>
+            <button onclick="resetAttempts()">Сбросить попытки</button>
+            <button onclick="showTargetChampion()">Показать цель</button>
+            <div id="admin-info"></div>
+        </div>
+        {% endif %}
+
+        <div class="profile-top-left">
+            {% if not request.endpoint == 'main.index' %}
+                <a href="{{ url_for('main.index') }}">Главная</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Основной контент страницы -->
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <div class="bottom-link">
+            {% if request.endpoint == 'main.index' %}
+                <a href="{{ url_for('main.changelog') }}">Изменения и обновления</a>
+            {% endif %}
+        </div>
+    </footer>
+
+    <!-- Подключение JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

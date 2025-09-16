@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}TFT Достижения - LolIdle{% endblock %}
+
+{% block content %}
+<div class="tft-container">
+    <h1>🔍 Проверка достижений в Teamfight Tactics</h1>
+    <p>Введите свой Riot ID, чтобы узнать, какие ачивки вы уже получили!</p>
+
+    <form method="POST" action="{{ url_for('tft.search_player') }}" class="tft-search-form">
+        <input type="text" name="game_name" placeholder="Имя игрока" required>
+        <input type="text" name="tag_line" placeholder="Тег (например, RU1)" required>
+        
+        <!-- Выпадающий список для выбора региона -->
+        <select name="region" required>
+            <option value="" disabled selected>Выберите регион</option>
+            <option value="americas">Americas</option>
+            <option value="asia">Asia</option>
+            <option value="europe" selected>Europe</option>
+        </select>
+        
+        <button type="submit">Найти</button>
+    </form>
+
+    {% if player_name %}
+        <h2>Результаты для: {{ player_name }}</h2>
+
+        {% if unlocked_achievements %}
+            <div class="achievements-list">
+                <h3>🎉 Полученные достижения:</h3>
+                <ul>
+                    {% for ach in unlocked_achievements %}
+                    <li>
+                        <strong>{{ ach.icon }} {{ ach.name }}</strong>
+                        <p>{{ ach.description }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <p>Пока что вы не получили ни одного из отслеживаемых достижений. Продолжайте играть!</p>
+        {% endif %}
+
+        <div class="matches-list">
+            <h3>📊 Проанализированные матчи:</h3>
+            {% for match in analyzed_matches %}
+            <div class="match-card">
+                <h4>--- 🎯 Матч {{ loop.index }}: {{ match.id}} ---</h4>
+                <p>🏆 Место: {{ match.placement }}</p>
+                <p>📈 Уровень: {{ match.level }} | 💰 Золота: {{ match.gold_left }} | 🔄 Раунд: {{ match.last_round }}</p>
+
+                <p><strong>🧬 Синергии:</strong></p>
+                <ul class="traits-list">
+                    {% for trait in match.traits %}
+                    <li>- {{ trait.name }} (уровень {{ trait.tier }})</li>
+                    {% else %}
+                    <li>Нет активных синергий</li>
+                    {% endfor %}
+                </ul>
+
+                <p><strong>👾 Юниты:</strong></p>
+                <ul class="units-list">
+                    {% for unit in match.units %}
+                    <li>
+                        - {{ unit.character }} (★ {{ unit.tier }}) — предметы: 
+                        {% set item_list = unit.get('items', []) %}
+                        {% if item_list | length > 0 %}
+                            [{{ item_list | join(', ') }}]
+                        {% else %}
+                            [без предметов]
+                        {% endif %}
+                    </li>
+                    {% else %}
+                    <li>Нет юнитов</li>
+                    {% endfor %}
+                </ul>
+
+                {% if match.unlocked_in_match %}
+                    <div class="match-achievements">
+                        <strong>Новые ачивки в этом матче:</strong>
+                        <ul>
+                            {% for ach in match.unlocked_in_match %}
+                            <li>{{ ach.icon }} {{ ach.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.tft-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+.tft-search-form { display: flex; gap: 10px; margin: 20px 0; }
+.tft-search-form input { padding: 10px; flex: 1; }
+.tft-search-form button { padding: 10px 20px; }
+.achievements-list, .matches-list { margin-top: 30px; }
+.match-achievements { background: #e8f5e8; padding: 10px; margin-top: 10px; border-radius: 4px; }
+.match-card {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+}
+.match-card h4 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+.traits-list, .units-list {
+    list-style-type: none;
+    padding-left: 20px;
+}
+.traits-list li, .units-list li {
+    margin: 4px 0;
+    font-size: 14px;
+}
+</style>
+{% endblock %}

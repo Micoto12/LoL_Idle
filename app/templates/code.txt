@@ -1,0 +1,216 @@
+changelog.html
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменения и обновления</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <div class="changelog">
+        <h1>Список изменений и будущих обновлений</h1>
+        <pre>{{ content }}</pre>
+    </div>
+
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
+</body>
+</html>
+
+-------------------------
+
+index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lolidle</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    
+    {% if current_user.is_authenticated %}
+        <div class="top-links">
+            <a href="{{ url_for('profile') }}">Профиль</a>
+        </div>
+    {% else %}
+        <div class="top-links">
+            <a href="{{ url_for('login') }}">Войти</a>
+            <a href="{{ url_for('register') }}">Зарегистрироваться</a>
+        </div>
+    {% endif %}
+
+    {% if current_user.is_authenticated and current_user.username == 'admin' %}
+    <div class="admin-panel">
+        <button onclick="resetUsedChampions()">Сбросить использованных чемпионов</button>
+        <button onclick="resetAttempts()">Сбросить попытки</button>
+        <button onclick="showTargetChampion()">Показать угадываемого чемпиона</button>
+        <div id="admin-info"></div>
+    </div>
+    {% endif %}
+
+    <div class="guess-container" id="guess-block" style="display: none;">
+        <div id="game-message"></div>
+        <form id="guessForm" autocomplete="off">
+            <input id="guessInput" type="text" ...>
+            <button type="submit" id="guessBtn">Отправить</button>
+        </form>
+        <div id="autocomplete-list" class="autocomplete-items"></div>
+    </div>
+
+    <div id="win-message" class="result-message" style="display: none;"></div>
+    <div id="hints-container" class="result-message" style="display: none;"></div>
+    
+    <div class="start-game-container" id="start-game-container">
+        <button id="startGameBtn" onclick="startGame()">Новая игра</button>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+    
+<div class="bottom-link">
+    <a href="{{ url_for('changelog') }}">Изменения и обновления</a>
+</div>
+</body>
+</html>
+
+--------------------
+
+leaderboard.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Рейтинг игроков</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="leaderboard-table-container">
+        <h2>Топ-10 по очкам</h2>
+        <table class="leaderboard-table">
+            <tr>
+                <th>Место</th>
+                <th>Имя пользователя</th>
+                <th>Очки</th>
+            </tr>
+            {% for row in points_results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row[0] }}</td>
+                <td>{{ "%.2f"|format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="leaderboard-table-container">
+        <h2>Топ-10 по рейтингу</h2>
+        <table class="leaderboard-table">
+            <tr>
+                <th>Место</th>
+                <th>Имя пользователя</th>
+                <th>Рейтинг</th>
+            </tr>
+            {% for row in rating_results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ row[0] }}</td>
+                <td>{{ "%.2f"|format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <div class="profile-top-left">
+        <a href="{{ url_for('profile') }}">Вернуться в профиль</a>
+    </div>
+</body>
+</html>
+
+--------------------
+
+login.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
+    <div class="center-content">
+        <h1 style="color:#2d3a4b; margin-bottom: 28px;">Авторизация</h1>
+        <form method="POST" style="display:flex; flex-direction:column; gap:18px; width:320px;">
+            <input type="text" name="username" placeholder="Никнейм" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <input type="password" name="password" placeholder="Пароль" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <button type="submit" style="padding:14px; border-radius:8px; background:#1246add5; color:#78a5f7fa; border:none; font-weight:bold; font-size:1.1em; cursor:pointer; transition:background 0.2s;">Войти</button>
+        </form>
+        <div style="margin-top:18px;">
+            <a href="{{ url_for('register') }}" style="color:#36a8eb; background:#416eff60; font-weight:bold; padding:6px 12px; border-radius:4px; text-decoration:none; transition:background 0.2s;">Нет аккаунта? Зарегистрируйся</a>
+        </div>
+    </div>
+</body>
+</html>
+
+--------------------
+
+profile.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="profile-info">
+        <h1>{{ current_user.username }}</h1>
+        <p>Колличество сыгранных игр: {{ total_games }}</p>
+        <p>Сумма очков: {{ total_points }}</p>
+        <p>Рейтинг (среднее за последние 20 игр): {{ rating }}</p>
+        <!-- Добавьте другие поля по необходимости -->
+    </div>
+
+    <div class="profile-side-links">
+        <a href="{{ url_for('leaderboard') }}">Рейтинг игроков</a>
+        <a href="{{ url_for('logout') }}">Выйти</a>
+    </div>
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
+</body>
+</html>
+
+--------------------
+
+register.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="profile-top-left">
+        <a href="{{ url_for('index') }}">На главную</a>
+    </div>
+    <div class="center-content">
+        <h1 style="color:#2d3a4b; margin-bottom: 28px;">Регистрация</h1>
+        <form method="POST" style="display:flex; flex-direction:column; gap:18px; width:320px;">
+            <input type="text" name="username" placeholder="Никнейм" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <input type="password" name="password" placeholder="Пароль" required style="padding:14px; border-radius:8px; border:1px solid #c2bb7f; background:#fff;">
+            <button type="submit" style="padding:14px; border-radius:8px; background:#1246add5; color:#78a5f7fa; border:none; font-weight:bold; font-size:1.1em; cursor:pointer; transition:background 0.2s;">Зарегистрироваться</button>
+        </form>
+        <div style="margin-top:18px;">
+            <a href="{{ url_for('login') }}" style="color:#36a8eb; background:#416eff60; font-weight:bold; padding:6px 12px; border-radius:4px; text-decoration:none; transition:background 0.2s;">Уже есть аккаунт? Войти</a>
+        </div>
+    </div>
+</body>
+</html>

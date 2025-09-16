@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - LolIdle{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="guess-container" id="guess-block" style="display: none;">
+        <div id="game-message"></div>
+        <form id="guessForm" autocomplete="off">
+            <input id="guessInput" type="text" placeholder="Введите имя чемпиона...">
+            <button type="submit" id="guessBtn">Отправить</button>
+        </form>
+        <div id="autocomplete-list" class="autocomplete-items"></div>
+    </div>
+
+    <div id="win-message" class="result-message" style="display: none;"></div>
+    <div id="hints-container" class="result-message" style="display: none;"></div>
+
+    <div class="start-game-container" id="start-game-container">
+        <button id="startGameBtn" onclick="startGame()">Новая игра</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Автоматически проверить статус игры при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        checkGameStatus();
+    });
+</script>
+{% endblock %}

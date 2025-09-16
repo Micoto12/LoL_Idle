@@ -9,7 +9,8 @@ function startGame() {
         .then(response => response.json())
         .then(data => {
             document.getElementById('game-message').innerText = "Игра началась! Введите имя чемпиона.";
-            document.getElementById('result').innerText = "";
+            document.getElementById('win-message').style.display = 'none';
+            document.getElementById('hints-container').style.display = 'none';
             document.getElementById('startGameBtn').style.display = "none";
             document.getElementById('guessBtn').style.display = "inline";
             document.getElementById('guessInput').value = "";
@@ -42,18 +43,25 @@ function sendGuess() {
             saveUsedChampions();
             updateAutocompleteSource();
 
+            document.getElementById('win-message').innerHTML = '';
+            document.getElementById('hints-container').innerHTML = '';
+            document.getElementById('win-message').style.display = 'none';
+            document.getElementById('hints-container').style.display = 'none';
+
             if (data.result === "correct") {
-                document.getElementById('result').innerText = `Правильно! Попыток: ${data.attempts}`;
+                document.getElementById('win-message').innerText = `Правильно! Попыток: ${data.attempts}`;
+                document.getElementById('win-message').style.display = 'block';
                 document.getElementById('guessBtn').style.display = "none";
                 document.getElementById('startGameBtn').style.display = "inline";
+                document.getElementById('guess-block').style.display = "none";
                 handleNewGameStart();
             } else {
-                document.getElementById('result').innerHTML =
+                document.getElementById('hints-container').innerHTML =
                     `Неправильно!<br>Подсказки:<ul>` +
                     data.hints.map(hint => `<li>${hint}</li>`).join('') +
                     `</ul>(Попыток: ${data.attempts})`;
+                document.getElementById('hints-container').style.display = 'block';
             }
-            //console.log('usedChampions:', usedChampions);
         }
     });
 }
@@ -108,7 +116,8 @@ function updateAutocompleteSource() {
 
 function showGameInterface(attempts = 0) {
     document.getElementById('game-message').innerText = "Игра продолжается! Введите имя чемпиона.";
-    document.getElementById('result').innerText = attempts > 0 ? `Попыток: ${attempts}` : "";
+    document.getElementById('win-message').style.display = 'none';
+    document.getElementById('hints-container').style.display = 'none';
     document.getElementById('startGameBtn').style.display = "none";
     document.getElementById('guessBtn').style.display = "inline";
     document.getElementById('guessInput').value = "";
@@ -120,7 +129,8 @@ function showStartButton() {
     document.getElementById('guess-block').style.display = 'none';
     document.getElementById('guessBtn').style.display = "none";
     document.getElementById('game-message').innerText = "";
-    document.getElementById('result').innerText = "";
+    document.getElementById('win-message').style.display = 'none';
+    document.getElementById('hints-container').style.display = 'none';
 }
 
 function resetUsedChampions() {
@@ -183,8 +193,6 @@ window.onload = function() {
         });
 
     document.getElementById('startGameBtn').addEventListener('click', startGame);
-    //document.getElementById('guessBtn').addEventListener('click', sendGuess);
-
     document.getElementById('guessInput').addEventListener('keydown', function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
